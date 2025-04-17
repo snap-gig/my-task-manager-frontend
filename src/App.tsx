@@ -6,6 +6,7 @@ import { TaskModal } from "./components/TaskModal";
 import { Layout, Plus } from "lucide-react";
 
 const boardId = "32c69b32-b687-491b-80f4-43ce74dd0449";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [boards, setBoards] = useState<Board[]>([
@@ -19,8 +20,9 @@ function App() {
 
   const fetchTasksByStatus = async (status: Status) => {
     try {
+      console.log(`Fetching ${status} tasks from ${API_URL}`);
       const response = await axios.get(
-        `https://62ff-2405-201-402e-e0c4-addd-f191-1e31-6522.ngrok-free.app/api/tasks/board/${boardId}/status/${status}`
+        `${API_URL}/api/tasks/board/${boardId}/status/${status}`
       );
       console.log(`Fetched ${status} tasks:`, response.data);
       return response.data.data;
@@ -67,7 +69,7 @@ function App() {
     const taskId = e.dataTransfer.getData("taskId");
     try {
       await axios.put(
-        `https://62ff-2405-201-402e-e0c4-addd-f191-1e31-6522.ngrok-free.app/api/tasks/${taskId}`,
+        `${API_URL}/api/tasks/${taskId}`,
         { status }
       );
       await fetchAllTasks();
@@ -86,21 +88,19 @@ function App() {
     try {
       if (editingTask) {
         await axios.put(
-          `https://62ff-2405-201-402e-e0c4-addd-f191-1e31-6522.ngrok-free.app/api/tasks/${editingTask.id}`,
+          `${API_URL}/api/tasks/${editingTask.id}`,
           {
             title: taskData.title,
-            description: taskData.description, // Note: API expects 'discription' not 'description'
+            description: taskData.description,
             status: taskData.status,
           }
         );
       } else {
-        // const newTaskId = Math.random().toString(36).substr(2, 9);
         await axios.post(
-          "https://62ff-2405-201-402e-e0c4-addd-f191-1e31-6522.ngrok-free.app/api/tasks",
+          `${API_URL}/api/tasks`,
           {
-            // id: newTaskId,
             title: taskData.title,
-            description: taskData.description, // Note: API expects 'discription' not 'description'
+            description: taskData.description,
             status: taskData.status,
             boardId: boardId,
           }
@@ -117,8 +117,9 @@ function App() {
 
   const handleDeleteTask = async (taskId: string) => {
     try {
+      
       await axios.delete(
-        `https://62ff-2405-201-402e-e0c4-addd-f191-1e31-6522.ngrok-free.app/api/tasks/${taskId}`
+        `${API_URL}/api/tasks/${taskId}`
       );
       await fetchAllTasks();
     } catch (err) {
